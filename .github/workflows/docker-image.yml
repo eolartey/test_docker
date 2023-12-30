@@ -17,13 +17,6 @@ jobs:
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag eolartey/gcc-arm:latest
 
-default:
-   image: eolartey/gcc-arm
-   
-stages:          # List of stages for jobs, and their order of execution
-  - build
-  - test
-  - deploy
  
 build-job:       # This job runs in the build stage, which runs first.
   stage: build
