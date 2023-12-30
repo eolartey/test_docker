@@ -1,18 +1,39 @@
-name: Docker Image CI
+default:
+   image: eolartey/gcc-arm
+   
+stages:          # List of stages for jobs, and their order of execution
+  - build
+  - test
+  - deploy
+ 
+build-job:       # This job runs in the build stage, which runs first.
+  stage: build
+  script:
+    - echo "Compiling the code..."
+    - cd Blinky/Debug/
+    - make clean
+    - make all
+    - echo "Compile complete."
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+unit-test-job:   # This job runs in the test stage.
+  stage: test    # It only starts when the job in the build stage completes successfully.
+  script:
+    - echo "Running unit tests...."
+    - cd Blinky/Debug/
+    - make tests
 
-jobs:
+lint-test-job:   # This job also runs in the test stage.
+  stage: test    # It can run at the same time as unit-test-job (in parallel).
+  script:
+    - echo "Linting code... This will take about 10 seconds."
+    - sleep 10
+    - echo "No lint issues found."
 
-  build:
+deploy-job:      # This job runs in the deploy stage.
+  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+  environment: production
+  script:
+    - echo "Deploying application..."
+    - echo "Application successfully deployed."
 
-    runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v3
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
